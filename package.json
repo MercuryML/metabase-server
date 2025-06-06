@@ -1,8 +1,7 @@
 {
-  "name": "metabase-server",
-  "version": "0.1.0",
+  "name": "@mercuryml/metabase-server",
+  "version": "0.1.1",
   "description": "A Model Context Protocol server",
-  "private": true,
   "type": "module",
   "bin": {
     "metabase-server": "./build/index.js"
