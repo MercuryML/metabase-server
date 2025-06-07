@@ -474,7 +474,7 @@ class MetabaseServer {
           },
           {
             name: "update_dashboard",
-            description: "Update an existing Metabase dashboard.",
+            description: "Update an existing Metabase dashboard or add cards to the dashboard.",
             inputSchema: {
               type: "object",
               properties: {
@@ -483,6 +483,19 @@ class MetabaseServer {
                 description: { type: "string", description: "New description for the dashboard" },
                 parameters: { type: "array", description: "New parameters for the dashboard", items: { type: "object" } },
                 collection_id: { type: "number", description: "New collection ID" },
+                dashcards: { type: "array", description: "Cards to add to the dashboard", items: { 
+                  type: "object",
+                  properties: {
+                    cardId: { type: "number", description: "ID of the card to add" },
+                    sizeX: { type: "number", description: "Width of the card in grid units" },
+                    sizeY: { type: "number", description: "Height of the card in grid units" },
+                    row: { type: "number", description: "Row position in the dashboard grid" },
+                    col: { type: "number", description: "Column position in the dashboard grid" },
+                    id: { type: "number", description: "ID for the card in the dashboard" }
+
+                  },
+                  required: ["cardId", "sizeX", "sizeY", "row", "col", "id"] 
+                } },
                 archived: { type: "boolean", description: "Set to true to archive the dashboard" }
               },
               required: ["dashboard_id"]
