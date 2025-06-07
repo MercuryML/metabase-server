@@ -486,12 +486,12 @@ class MetabaseServer {
                 dashcards: { type: "array", description: "Cards to add to the dashboard", items: { 
                   type: "object",
                   properties: {
-                    cardId: { type: "number", description: "ID of the card to add" },
-                    sizeX: { type: "number", description: "Width of the card in grid units" },
-                    sizeY: { type: "number", description: "Height of the card in grid units" },
+                    card_id: { type: "number", description: "ID of the card to add" },
+                    size_x: { type: "number", description: "Width of the card in grid units" },
+                    size_y: { type: "number", description: "Height of the card in grid units" },
                     row: { type: "number", description: "Row position in the dashboard grid" },
                     col: { type: "number", description: "Column position in the dashboard grid" },
-                    id: { type: "number", description: "ID for the card in the dashboard" }
+                    id: { type: "number", description: "ID for the card in the dashboard, this has to be unique" }
 
                   },
                   required: ["cardId", "sizeX", "sizeY", "row", "col", "id"] 
