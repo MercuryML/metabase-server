@@ -431,7 +431,7 @@ class MetabaseServer {
                         template_tags: {
                           type: "object",
                           description: "Template tags for parameters",
-                          properties: {
+                          additionalProperties: {
                             type: "object",
                             properties: {
                               id: { type: "string", description: "Parameter ID" },
@@ -478,7 +478,7 @@ class MetabaseServer {
                         template_tags: {
                           type: "object",
                           description: "Template tags for parameters",
-                          properties: {
+                          additionalProperties: {
                             type: "object",
                             properties: {
                               id: { type: "string", description: "Parameter ID" },
@@ -549,7 +549,7 @@ class MetabaseServer {
                       id: { type: "string", description: "Unique identifier for the parameter" },
                       name: { type: "string", description: "Name of the parameter" },
                       type: { type: "string", description: "Type of the parameter (e.g., 'text', 'number', 'date')" },
-                      default: { type: "any", description: "Default value for the parameter" }
+                      default: { description: "Default value for the parameter" }
                     },
                     required: ["id", "name", "type"]
                   } 
