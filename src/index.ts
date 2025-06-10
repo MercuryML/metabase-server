@@ -13,7 +13,7 @@ global.AbortController = global.AbortController || AbortController;
  * - 执行问题查询
  * - 获取仪表板详情
  */
-
+import pkg from "../package.json" with { type: "json" };
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -27,6 +27,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import axios, { AxiosInstance } from "axios";
+import { assert } from 'console';
 
 // 自定义错误枚举
 enum ErrorCode {
@@ -77,7 +78,7 @@ class MetabaseServer {
     this.server = new Server(
       {
         name: "metabase-server",
-        version: "0.1.0",
+        version: pkg.version,
       },
       {
         capabilities: {
@@ -916,7 +917,7 @@ class MetabaseServer {
 
   async run() {
     try {
-      this.logInfo('Starting Metabase MCP server...');
+      this.logInfo(`Starting Metabase MCP server version ${pkg.version}...`);
       const transport = new StdioServerTransport();
       await this.server.connect(transport);
       this.logInfo('Metabase MCP server running on stdio');
