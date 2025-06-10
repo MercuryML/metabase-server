@@ -704,7 +704,7 @@ class MetabaseServer {
             return {
               content: [{
                 type: "text",
-                text: JSON.stringify(response.data.cards, null, 2)
+                text: JSON.stringify(response.data.dashcards, null, 2)
               }]
             };
           }
