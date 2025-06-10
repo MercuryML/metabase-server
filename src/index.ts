@@ -419,7 +419,37 @@ class MetabaseServer {
               type: "object",
               properties: {
                 name: { type: "string", description: "Name of the card" },
-                dataset_query: { type: "object", description: "The query for the card (e.g., MBQL or native query)" },
+                dataset_query: {
+                  type: "object",
+                  description: "The query for the card (e.g., MBQL or native query)",
+                  properties: {
+                    type: { type: "string", enum: ["native"], description: "Query type" },
+                    native: {
+                      type: "object",
+                      properties: {
+                        query: { type: "string", description: "SQL query string" },
+                        template_tags: {
+                          type: "object",
+                          description: "Template tags for parameters",
+                          properties: {
+                            type: "object",
+                            properties: {
+                              id: { type: "string", description: "Parameter ID" },
+                              name: { type: "string", description: "Parameter name" },
+                              display_name: { type: "string", description: "Display name" },
+                              type: { type: "string", description: "Parameter type" },
+                              default: { }, // can be any type
+                            },
+                            required: ["id", "name", "type"]
+                          }
+                        }
+                      },
+                      required: ["query"]
+                    },
+                    database: { type: "number", description: "Database ID" }
+                  },
+                  required: ["type", "native", "database"]
+                },
                 display: { type: "string", description: "Display type (e.g., 'table', 'line', 'bar')" },
                 visualization_settings: { type: "object", description: "Settings for the visualization" },
                 collection_id: { type: "number", description: "Optional ID of the collection to save the card in" },
@@ -436,7 +466,36 @@ class MetabaseServer {
               properties: {
                 card_id: { type: "number", description: "ID of the card to update" },
                 name: { type: "string", description: "New name for the card" },
-                dataset_query: { type: "object", description: "New query for the card" },
+                dataset_query: {
+                  type: "object",
+                  description: "The query for the card (e.g., MBQL or native query)",
+                  properties: {
+                    type: { type: "string", enum: ["native"], description: "Query type" },
+                    native: {
+                      type: "object",
+                      properties: {
+                        query: { type: "string", description: "SQL query string" },
+                        template_tags: {
+                          type: "object",
+                          description: "Template tags for parameters",
+                          properties: {
+                            type: "object",
+                            properties: {
+                              id: { type: "string", description: "Parameter ID" },
+                              name: { type: "string", description: "Parameter name" },
+                              display_name: { type: "string", description: "Display name" },
+                              type: { type: "string", description: "Parameter type" },
+                              default: { }, // can be any type
+                            },
+                            required: ["id", "name", "type"]
+                          }
+                        }
+                      },
+                      required: ["query"]
+                    },
+                    database: { type: "number", description: "Database ID" }
+                  }
+                },
                 display: { type: "string", description: "New display type" },
                 visualization_settings: { type: "object", description: "New visualization settings" },
                 collection_id: { type: "number", description: "New collection ID" },
@@ -481,7 +540,20 @@ class MetabaseServer {
                 dashboard_id: { type: "number", description: "ID of the dashboard to update" },
                 name: { type: "string", description: "New name for the dashboard" },
                 description: { type: "string", description: "New description for the dashboard" },
-                parameters: { type: "array", description: "New parameters for the dashboard", items: { type: "object" } },
+                parameters: { 
+                  type: "array", 
+                  description: "New parameters for the dashboard, this can be used to filter the cards in the dashboard", 
+                  items: { 
+                    type: "object",
+                    properties: {
+                      id: { type: "string", description: "Unique identifier for the parameter" },
+                      name: { type: "string", description: "Name of the parameter" },
+                      type: { type: "string", description: "Type of the parameter (e.g., 'text', 'number', 'date')" },
+                      default: { type: "any", description: "Default value for the parameter" }
+                    },
+                    required: ["id", "name", "type"]
+                  } 
+                },
                 collection_id: { type: "number", description: "New collection ID" },
                 dashcards: { type: "array", description: "Cards to add to the dashboard", items: { 
                   type: "object",
@@ -491,10 +563,38 @@ class MetabaseServer {
                     size_y: { type: "number", description: "Height of the card in grid units" },
                     row: { type: "number", description: "Row position in the dashboard grid" },
                     col: { type: "number", description: "Column position in the dashboard grid" },
-                    id: { type: "number", description: "ID for the card in the dashboard, this has to be unique" }
-
+                    id: { type: "number", description: "ID for the card in the dashboard, this has to be unique" },
+                    parameter_mappings: {
+                      type: "array",
+                      description: "parameter mappings for the card, this is used to filter the card based on the dashboard parameters",
+                      items: {
+                        type: "object",
+                        properties: {
+                          parameter_id: { type: "string", description: "ID of the parameter to map" },
+                          card_id: { type: "number", description: "ID of the card to map the parameter to" },
+                          target: {
+                            type: "array",
+                            description: "Target fields in the card to apply the parameter mapping to",
+                            minItems: 2,
+                            maxItems: 2,
+                            items: [
+                              { type: "string", description: "Target type, e.g., 'variable'" },
+                              {
+                                type: "array",
+                                minItems: 2,
+                                maxItems: 2,
+                                items: [
+                                  { type: "string", description: "Template tag type, e.g., 'template-tag'" },
+                                  { type: "string", description: "Parameter name" }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
                   },
-                  required: ["cardId", "sizeX", "sizeY", "row", "col", "id"] 
+                  required: ["card_id", "size_x", "size_y", "row", "col", "id"] 
                 } },
                 archived: { type: "boolean", description: "Set to true to archive the dashboard" }
               },
