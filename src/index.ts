@@ -574,21 +574,35 @@ class MetabaseServer {
                           parameter_id: { type: "string", description: "ID of the parameter to map" },
                           card_id: { type: "number", description: "ID of the card to map the parameter to" },
                           target: {
-                            type: "array",
-                            description: "Target fields in the card to apply the parameter mapping to",
-                            minItems: 2,
-                            maxItems: 2,
-                            items: [
-                              { type: "string", description: "Target type, e.g., 'variable'" },
+                            "type": "array",
+                            "description": "Target field for Metabase dashboard parameter_mappings",
+                            "prefixItems": [
                               {
-                                type: "array",
-                                minItems: 2,
-                                maxItems: 2,
-                                items: [
-                                  { type: "string", description: "Template tag type, e.g., 'template-tag'" },
-                                  { type: "string", description: "Parameter name" }
-                                ]
+                                "type": "string",
+                                "const": "variable"
+                              },
+                              {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "string",
+                                    "const": "template-tag"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "description": "The name of the template tag (parameter name)"
+                                  }
+                                ],
+                                "items": false,
+                                "minItems": 2,
+                                "maxItems": 2
                               }
+                            ],
+                            "items": false,
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "examples": [
+                              ["variable", ["template-tag", "user_id"]]
                             ]
                           }
                         }
