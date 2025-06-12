@@ -414,6 +414,28 @@ class MetabaseServer {
             }
           },
           {
+            name: "get_field_id",
+            description: "Get the field ID for a specific field in a table. This is useful for creating field filters in Metabase.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                database_id: {
+                  type: "number",
+                  description: "ID of the database"
+                },
+                table_name: {
+                  type: "string",
+                  description: "Name of the table"
+                },
+                field_name: {
+                  type: "string",
+                  description: "Name of the field"
+                }
+              },
+              required: ["database_id", "table_name", "field_name"]
+            }
+          },
+          {
             name: "create_card",
             description: "Create a new Metabase question (card).",
             inputSchema: {
@@ -768,6 +790,29 @@ class MetabaseServer {
               }]
             };
           }
+
+          case "get_field_id": {
+            const { database_id, table_name, field_name } = request.params?.arguments || {};
+            if (!database_id || !table_name || !field_name) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                "Missing required fields for get_field_filter_id: database_id, table_name, field_name"
+              );  
+            }
+            const response = await this.axiosInstance.get(`/api/database/${database_id}/metadata`);
+            const tables = response.data.tables;
+
+            for (const table of tables) {
+              if (table.name === table_name) {
+                for (const field of table.fields) {
+                  if (field.name === field_name) {
+                    return field.id;
+                  }
+                }
+              }
+            }
+          }
+
 
           case "create_card": {
             const { name, dataset_query, display, visualization_settings, collection_id, description } = request.params?.arguments || {};

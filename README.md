@@ -24,6 +24,7 @@ This is a TypeScript-based MCP server that implements integration with Metabase 
 - `execute_card` - Execute a Metabase question/card and get results
 - `get_dashboard_cards` - Get all cards in a dashboard
 - `execute_query` - Execute a SQL query against a Metabase database
+- `get_field_id` - Get the field ID for a specific field in a table. This is useful for creating field filters in Metabase.
 
 ## Configuration
 
