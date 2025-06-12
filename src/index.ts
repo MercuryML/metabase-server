@@ -438,7 +438,27 @@ class MetabaseServer {
                               id: { type: "string", description: "Parameter ID" },
                               name: { type: "string", description: "Parameter name" },
                               display_name: { type: "string", description: "Display name" },
-                              type: { type: "string", description: "Parameter type" },
+                              type: { type: "string", description: "Parameter type. Use 'dimension' for field filter" },
+                              dimension: {
+                                type: "array",
+                                description: "Dimension for field filter, this is required if type is 'dimension'",
+                                prefixItems: [
+                                  {
+                                    type: "string",
+                                    enum: ["field-id"]
+                                  },
+                                  {
+                                    type: "number",
+                                    description: "Field ID for the dimension"
+                                  }
+                                ],
+                                items: false,
+                                minItems: 2,
+                                maxItems: 2,
+                                examples: [
+                                  ["field-id", 123] // Example for field filter
+                                ]
+                              },
                               default: { }, // can be any type
                             },
                             required: ["id", "name", "type"]
@@ -549,7 +569,7 @@ class MetabaseServer {
                     properties: {
                       id: { type: "string", description: "Unique identifier for the parameter" },
                       name: { type: "string", description: "Name of the parameter" },
-                      type: { type: "string", description: "Type of the parameter (e.g., 'text', 'number', 'date')" },
+                      type: { type: "string", description: "Type of the parameter (e.g., 'text', 'number', 'date'). For field filters, use 'category'." },
                       default: { description: "Default value for the parameter" }
                     },
                     required: ["id", "name", "type"]
@@ -578,8 +598,8 @@ class MetabaseServer {
                             "description": "Target field for Metabase dashboard parameter_mappings",
                             "prefixItems": [
                               {
-                                "type": "string",
-                                "const": "variable"
+                                "type": "string", 
+                                "enum": ["variable", "dimension"]
                               },
                               {
                                 "type": "array",
