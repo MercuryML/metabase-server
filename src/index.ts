@@ -419,10 +419,6 @@ class MetabaseServer {
             inputSchema: {
               type: "object",
               properties: {
-                database_id: {
-                  type: "number",
-                  description: "ID of the database"
-                },
                 table_name: {
                   type: "string",
                   description: "Name of the table"
@@ -432,7 +428,7 @@ class MetabaseServer {
                   description: "Name of the field"
                 }
               },
-              required: ["database_id", "table_name", "field_name"]
+              required: ["table_name", "field_name"]
             }
           },
           {
@@ -792,25 +788,56 @@ class MetabaseServer {
           }
 
           case "get_field_id": {
-            const { database_id, table_name, field_name } = request.params?.arguments || {};
-            if (!database_id || !table_name || !field_name) {
+            const { table_name, field_name } = request.params?.arguments || {};
+            if (!table_name || !field_name) {
               throw new McpError(
                 ErrorCode.InvalidParams,
-                "Missing required fields for get_field_filter_id: database_id, table_name, field_name"
+                "Missing required fields for get_field_filter_id: table_name, field_name"
               );  
             }
-            const response = await this.axiosInstance.get(`/api/database/${database_id}/metadata`);
-            const tables = response.data.tables;
-
-            for (const table of tables) {
-              if (table.name === table_name) {
-                for (const field of table.fields) {
-                  if (field.name === field_name) {
-                    return field.id;
-                  }
-                }
+            const response = await this.axiosInstance.get("/api/search", {
+              params: {
+                q: table_name,
+                type: "table",
               }
+            });
+            interface MetabaseTableSearchResult {
+              id: number;
+              name: string;
+              table_name: string;
+              database_id: number;
             }
+
+            const table: MetabaseTableSearchResult | undefined = response.data.find(
+              (r: MetabaseTableSearchResult) => r.table_name === table_name
+            );
+            if (!table) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                `Table not found: ${table_name}`
+              );
+            }
+            const table_id = table.id;
+
+            const table_metadata = await this.axiosInstance.get(`/api/table/${table_id}/query_metadata`);
+            const field = table_metadata.data.fields.find((f: any) => f.name === field_name);
+            if (!field) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                `Field not found: ${field_name} in table ${table_name}`
+              );
+            }
+            return {
+              content: [{
+                type: "text",
+                text: JSON.stringify({
+                  field_id: field.id,
+                  table_id: table_id,
+                  table_name: table_name,
+                  field_name: field_name
+                }, null, 2)
+              }]
+            };
           }
 
 
