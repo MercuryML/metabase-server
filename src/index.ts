@@ -808,7 +808,7 @@ class MetabaseServer {
               database_id: number;
             }
 
-            const table: MetabaseTableSearchResult | undefined = response.data.find(
+            const table: MetabaseTableSearchResult | undefined = response.data.data.find(
               (r: MetabaseTableSearchResult) => r.table_name === table_name
             );
             if (!table) {
