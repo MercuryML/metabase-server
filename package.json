@@ -1,6 +1,6 @@
 {
   "name": "@mercuryml/metabase-server",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A Model Context Protocol server",
   "type": "module",
   "bin": {
