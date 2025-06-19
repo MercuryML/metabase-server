@@ -53,6 +53,7 @@ const METABASE_URL = process.env.METABASE_URL;
 const METABASE_USERNAME = process.env.METABASE_USERNAME;
 const METABASE_PASSWORD = process.env.METABASE_PASSWORD;
 const METABASE_API_KEY = process.env.METABASE_API_KEY;
+const METABASE_DATABASE_ID = 2; // 默认 ClickHouse 数据库 ID
 
 if (!METABASE_URL || (!METABASE_API_KEY && (!METABASE_USERNAME || !METABASE_PASSWORD))) {
   throw new Error(
@@ -683,7 +684,7 @@ class MetabaseServer {
             return {
               content: [{
                 type: "text",
-                text: JSON.stringify(response.data, null, 2)
+                text: JSON.stringify(response.data.map((d: any) => ({id: d.id, name: d.name, view_count: d.view_count})), null, 2)
               }]
             };
           }
@@ -693,7 +694,7 @@ class MetabaseServer {
             return {
               content: [{
                 type: "text",
-                text: JSON.stringify(response.data, null, 2)
+                text: JSON.stringify(response.data.length, null, 2)
               }]
             };
           }
@@ -703,7 +704,7 @@ class MetabaseServer {
             return {
               content: [{
                 type: "text",
-                text: JSON.stringify(response.data, null, 2)
+                text: JSON.stringify(response.data.data.map((d: any) => ({id: d.id, name: d.name})), null, 2)
               }]
             };
           }
@@ -809,7 +810,7 @@ class MetabaseServer {
             }
 
             const table: MetabaseTableSearchResult | undefined = response.data.data.find(
-              (r: MetabaseTableSearchResult) => r.table_name === table_name
+              (r: MetabaseTableSearchResult) => r.table_name === table_name && r.database_id === METABASE_DATABASE_ID
             );
             if (!table) {
               throw new McpError(
@@ -859,10 +860,11 @@ class MetabaseServer {
             if (description !== undefined) createCardBody.description = description;
 
             const response = await this.axiosInstance.post('/api/card', createCardBody);
+            const {id} = response.data
             return {
               content: [{
                 type: "text",
-                text: JSON.stringify(response.data, null, 2)
+                text: JSON.stringify({id, name, dataset_query, display, visualization_settings}, null, 2)
               }]
             };
           }
@@ -935,10 +937,11 @@ class MetabaseServer {
             if (collection_id !== undefined) createDashboardBody.collection_id = collection_id;
 
             const response = await this.axiosInstance.post('/api/dashboard', createDashboardBody);
+            const {id} = response.data;
             return {
               content: [{
                 type: "text",
-                text: JSON.stringify(response.data, null, 2)
+                text: JSON.stringify({id, name, description, parameters}, null, 2)
               }]
             };
           }
