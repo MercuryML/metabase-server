@@ -460,23 +460,13 @@ class MetabaseServer {
                               type: { type: "string", description: "Parameter type. Use 'dimension' for field filter" },
                               dimension: {
                                 type: "array",
-                                description: "Dimension for field filter, this is required if type is 'dimension'",
-                                prefixItems: [
-                                  {
-                                    type: "string",
-                                    enum: ["field-id"]
-                                  },
-                                  {
-                                    type: "number",
-                                    description: "Field ID for the dimension"
-                                  }
-                                ],
-                                items: false,
-                                minItems: 2,
-                                maxItems: 2,
-                                examples: [
-                                  ["field-id", 123] // Example for field filter
-                                ]
+                                description: "Dimension for field filter, format: ['field-id', field_id_number]",
+                                items: {
+                                  oneOf: [
+                                    {type: "string", enum: ["field-id"], description: "Field ID identifier"},
+                                    {type: "number", description: "Field ID number"}
+                                  ]
+                                }
                               },
                               default: { }, // can be any type
                             },
@@ -613,37 +603,15 @@ class MetabaseServer {
                           parameter_id: { type: "string", description: "ID of the parameter to map" },
                           card_id: { type: "number", description: "ID of the card to map the parameter to" },
                           target: {
-                            "type": "array",
-                            "description": "Target field for Metabase dashboard parameter_mappings",
-                            "prefixItems": [
-                              {
-                                "type": "string", 
-                                "enum": ["variable", "dimension"]
-                              },
-                              {
-                                "type": "array",
-                                "prefixItems": [
-                                  {
-                                    "type": "string",
-                                    "const": "template-tag"
-                                  },
-                                  {
-                                    "type": "string",
-                                    "description": "The name of the template tag (parameter name)"
-                                  }
-                                ],
-                                "items": false,
-                                "minItems": 2,
-                                "maxItems": 2
-                              }
-                            ],
-                            "items": false,
-                            "minItems": 2,
-                            "maxItems": 2,
-                            "examples": [
-                              ["variable", ["template-tag", "user_id"]]
-                            ]
-                          }
+                            type: "array",
+                            description: "Target field format: ['variable', ['template-tag', 'parameter_name']]",
+                            items: {
+                              oneOf: [
+                                {type: "string", enum: ["variable", "dimension"], description: "Target type, 'variable' for variable mapping, 'dimension' for field filter"},
+                                {type: "array", items: {type: "string", description: "The first element is always 'template-tag', the second element is the parameter name"}}
+                              ]
+                            },
+                          }  
                         }
                       }
                     }
